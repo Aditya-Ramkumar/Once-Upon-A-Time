@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body{							/*color of text to white*/
+color: white;
+}
+.switch {						/*toggle buttons' properties defined */
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+.button {							/*SAVE button creation*/
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 01s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.button1 {border-radius: 12px;}
+.button2 {border-radius: 12px;}
+.button3 {border-radius: 12px;}
+.button4 {border-radius: 12px;}
+.button5 {border-radius: 12px;}
+.button7 {border-radius: 12px;}
+.button6 {						/*properties of button*/
+    background-color: #4CAF50; 
+    color: white; 
+    border: 2px solid #4CAF50;
+}
+
+.button6:hover {					/*properties of butttons upon hovering*/ 
+    background-color: white;
+    color: black;
+}
+.button8 {background-color: #f44336;} 			/* Red */ 
+</style>
+</head>
+<body background="amaze.jpg">
+
+ <DIV align="center">
+  <font size="40">So your story goes here...</font><br><br>	<!--heading of website-->
+
+<button class="button button1" onclick="startAudio();">Voice 1 On</button>
+&emsp;&emsp;&emsp;&emsp;
+<button class="button button3" onclick="startAudio();">Voice 2 On</button>
+&emsp;&emsp;&emsp;&emsp;&emsp;
+<button class="button button5" onclick="startAudio();">Voice 3 On</button>
+&emsp;&emsp;&emsp;&emsp;
+<br>
+<button class="button button2" onclick="stopAudio1();">Voice 1 Off</button>
+&emsp;&emsp;&emsp;&emsp;
+<button class="button button4" onclick="stopAudio2();">Voice 2 Off</button>
+&emsp;&emsp;&emsp;&emsp;&emsp;
+<button class="button button7" onclick="stopAudio3();">Voice 3 Off</button>
+&emsp;&emsp;&emsp;&emsp;
+</DIV>
+<br><br><br><br><br><br><br><br><br><br><br><br><br>			<!--to make button at bottom-->
+<DIV align="center">
+<button class="button button8" onclick="playAudio();">END</button></DIV>
+
+
+<script src="./astronaut.js"></script>
+<script src="./megaphone.js"></script>
+<script src="./troll.js"></script>
+<script type="text/javascript">
+
+var buffers = [];
+var concatenatedBuffer = null;
+
+function pFileReader(file){
+  return new Promise((resolve, reject) => {
+    var fr = new FileReader(); 
+    fr.onload = (event) => {
+        resolve(event.target.result);
+    };
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+const recordAudio = () =>
+  new Promise(async (resolve) => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    const audioChunks = [];
+    mediaRecorder.addEventListener("dataavailable", event => {
+      audioChunks.push(event.data);
+    });
+
+    const start = () => mediaRecorder.start();
+
+    const stop = () =>
+      new Promise(async (resolve) => {
+        mediaRecorder.addEventListener("stop", async () => {
+          const audioBlob = new Blob(audioChunks);
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          const play = () => audio.play();
+         let arrayBuffer = await pFileReader(audioBlob);
+          resolve({ arrayBuffer });
+        });
+        
+        mediaRecorder.stop();
+                        
+      });
+
+    resolve({ start, stop });
+  });
+
+    function startAudio() {
+      decodedData = null;
+    recorder.start();
+}
+
+//Voice 1
+async function stopAudio1() {
+    const arrayBuffer = await recorder.stop();
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.decodeAudioData(arrayBuffer["arrayBuffer"]).then(async function(decodedData) {
+        let final1 = await astronautTransform(decodedData);
+        buffers.push(final1);
+        concatenatedBuffer = appendBuffer(concatenatedBuffer, final1);
+        console.log(concatenatedBuffer);
+       // let source = audioCtx.createBufferSource();
+
+        // // set the buffer in the AudioBufferSourceNode
+        // source.buffer = final1;
+
+        // // connect the AudioBufferSourceNode to the
+        // // destination so we can hear the sound
+        // source.connect(audioCtx.destination);
+
+        // // start the source playing
+        // source.start();
+    });
+}
+
+//Voice 2
+async function stopAudio2() {
+    const arrayBuffer = await recorder.stop();
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.decodeAudioData(arrayBuffer["arrayBuffer"]).then(async function(decodedData) {
+        let final2 = await megaphoneTransform(decodedData);
+        buffers.push(final2);
+        concatenatedBuffer = appendBuffer(concatenatedBuffer, final2);
+        console.log(concatenatedBuffer);
+        // let source = audioCtx.createBufferSource();
+
+        // // set the buffer in the AudioBufferSourceNode
+        // source.buffer = final2;
+
+        // // connect the AudioBufferSourceNode to the
+        // // destination so we can hear the sound
+        // source.connect(audioCtx.destination);
+
+        // // start the source playing
+        // source.start();
+    });
+}
+
+//Voice 3
+async function stopAudio3() {
+    const arrayBuffer = await recorder.stop();
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.decodeAudioData(arrayBuffer["arrayBuffer"]).then(async function(decodedData) {
+        let final3 = await trollTransform(decodedData);
+        buffers.push(final3);
+        concatenatedBuffer = appendBuffer(concatenatedBuffer, final3);
+        // let source = audioCtx.createBufferSource();
+
+        // // set the buffer in the AudioBufferSourceNode
+        // source.buffer = final3;
+
+        // // connect the AudioBufferSourceNode to the
+        // // destination so we can hear the sound
+        // source.connect(audioCtx.destination);
+
+        // // start the source playing
+        // source.start();
+    });
+}
+
+
+const sleep = time => new Promise(resolve => setTimeout(resolve, time));
+
+var recorder;
+
+(async () => {
+    recorder = await recordAudio();
+    console.log("done");    
+})(); 
+
+function appendBuffer(buffer1, buffer2) {
+  var context = new AudioContext();
+  if (!buffer1) return buffer2;
+  if (!buffer2) return buffer1;
+    var numberOfChannels = Math.min( buffer1.numberOfChannels, buffer2.numberOfChannels );
+    var tmp = context.createBuffer( numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate );
+    for (var i=0; i<numberOfChannels; i++) {
+      var channel = tmp.getChannelData(i);
+      channel.set( buffer1.getChannelData(i), 0);
+      channel.set( buffer2.getChannelData(i), buffer1.length);
+    }
+    return tmp;
+  }
+
+/*function concatShit(){
+    
+  var k = buffers[0];
+  for (var i = 1; i < buffers.length; i++){
+    var numberOfChannels = Math.min( buffers[i].numberOfChannels, k.numberOfChannels );
+    k = context.createBuffer( numberOfChannels, (buffers[i].length + k.length), k.sampleRate );
+  } 
+    for (var j=0; j<numberOfChannels; j++) {
+      var channel = k.getChannelData(j);
+      channel.set( buffers[i].getChannelData(j), 0);
+      channel.set( k.getChannelData(i), buffers[i].length);
+    }
+    return k;
+  }
+*/
+  
+  // var totalLength = 0;
+    // for (var i = 0; i<buffers.length; i++){
+    //     totalLength+=buffers[i].byteLength;
+    // }
+    // var result = new Uint8Array(totalLength);
+    // for (var i = 0; i<buffers.length; i++){
+    //     concatShit.set(buffers[i], concatShit.byteLength);
+    // }
+    //return result;
+
+
+function playAudio(){
+    
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+        let source = audioCtx.createBufferSource();
+        // set the buffer in the AudioBufferSourceNode
+        source.buffer = concatenatedBuffer;
+        // connect the AudioBufferSourceNode to the
+        // destination so we can hear the sound
+        source.connect(audioCtx.destination);
+
+        // start the source playing
+        source.start();
+    
+}
+
+</script>
+
+
+</body>
+</html> 
